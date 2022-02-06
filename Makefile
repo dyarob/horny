@@ -1,2 +1,2 @@
 helloncurses:
-	gcc helloncurses.c -lncurses
+	gcc test/helloncurses.c -lncurses
