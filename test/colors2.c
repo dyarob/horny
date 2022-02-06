@@ -3,9 +3,9 @@ int	main(int ac, char **av){
 initscr();
 start_color();
 
-for(int i=0; i<1000; i++){
+for(int i=0; i<256; i++){
 	if(i%24==0) printw("\n");
-	init_pair(i, i%255, i/100);
+	init_pair(i, i, 255-i);
 	attron(COLOR_PAIR(i));
 	printw("<3");}
 
