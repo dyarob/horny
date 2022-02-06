@@ -3,3 +3,6 @@ helloncurses:
 
 drawsmallmap:
 	gcc test/drawsmallmap.c
+
+colors:
+	gcc test/colors.c -lncurses
