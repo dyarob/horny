@@ -6,3 +6,6 @@ drawsmallmap:
 
 colors:
 	gcc test/colors.c -lncurses
+
+colors2:
+	gcc test/colors2.c -lncurses
