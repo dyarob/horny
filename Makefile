@@ -2,7 +2,7 @@ helloncurses:
 	gcc test/helloncurses.c -lncurses
 
 drawsmallmap:
-	gcc test/drawsmallmap.c
+	gcc test/drawsmallmap.c -lncurses
 
 colors:
 	gcc test/colors.c -lncurses
