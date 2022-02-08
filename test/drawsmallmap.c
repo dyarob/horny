@@ -109,6 +109,39 @@ default:
 	break;
 }}}
 
+//step 4: connect 8 groups
+
+//step 5: add 7 around 8
+for(char i=0; i<DSM_HEIGHT; i++){ for(char j=0; j<DSM_WIDTH; j++){
+if(m[i][j]==8)
+switch(i){
+case 0:
+	if(m[i+1][j]<7) m[i+1][j]=7;
+	switch(j){
+	case 0: if(m[i][j+1]<7) m[i][j+1]=7; break;
+	case DSM_WIDTH-1: if(m[i][j-1]<7) m[i][j-1]=7; break;
+	default: if(m[i][j+1]<7) m[i][j+1]=7;
+		 if(m[i][j-1]<7) m[i][j-1]=7; break;}
+	break;
+case DSM_HEIGHT-1:
+	if(m[i-1][j]<7) m[i-1][j]=7;
+	switch(j){
+	case 0: if(m[i][j+1]<7) m[i][j+1]=7; break;
+	case DSM_WIDTH-1: if(m[i][j-1]<7) m[i][j-1]=7; break;
+	default: if(m[i][j+1]<7) m[i][j+1]=7;
+		 if(m[i][j-1]<7) m[i][j-1]=7; break;}
+	break;
+default:
+	if(m[i+1][j]<7) m[i+1][j]=7;
+	if(m[i-1][j]<7) m[i-1][j]=7;
+	switch(j){
+	case 0: if(m[i][j+1]<7) m[i][j+1]=7; break;
+	case DSM_WIDTH-1: if(m[i][j-1]<7) m[i][j-1]=7; break;
+	default: if(m[i][j+1]<7) m[i][j+1]=7;
+		 if(m[i][j-1]<7) m[i][j-1]=7; break;}
+	break;
+}}}
+
 //display
 for(char i=0; i<DSM_HEIGHT; i++){ for(char j=0; j<DSM_WIDTH; j++){
 addch(m[i][j]+'0');} addch('\n');}
