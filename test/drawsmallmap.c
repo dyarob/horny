@@ -24,45 +24,37 @@ for(char i=0; i<DSM_HEIGHT; i++) m[i] = (char *)malloc(DSM_WIDTH);
 for(char i=0; i<DSM_HEIGHT; i++) for(char j=0; j<DSM_WIDTH; j++){
 m[i][j] = rand()%10;}
 
+for(char i=0; i<DSM_HEIGHT; i++){ for(char j=0; j<DSM_WIDTH; j++){
+if(m[i][j]==9)
+switch(i){
+case 0:
+	if(m[i+1][j]!=9)
+	switch(j){
+	case 0: if(m[i][j+1]!=9) m[i][j]=8; break;
+	case DSM_WIDTH-1: if(m[i][j-1]!=9) m[i][j]=8; break;
+	default: if(m[i][j+1]!=9 && m[i][j-1]!=9) m[i][j]=8; break;}
+	break;
+case DSM_HEIGHT-1:
+	if(m[i-1][j]!=9)
+	switch(j){
+	case 0: if(m[i][j+1]!=9) m[i][j]=8; break;
+	case DSM_WIDTH-1: if(m[i][j-1]!=9) m[i][j]=8; break;
+	default: if(m[i][j+1]!=9 && m[i][j-1]!=9) m[i][j]=8; break;}
+	break;
+default:
+	if(m[i+1][j]!=9 && m[i-1][j]!=9)
+	switch(j){
+	case 0: if(m[i][j+1]!=9) m[i][j]=8; break;
+	case DSM_WIDTH-1: if(m[i][j-1]!=9) m[i][j]=8; break;
+	default: if(m[i][j+1]!=9 && m[i][j-1]!=9) m[i][j]=8; break;}
+	break;
+}}}
+
 //display
 for(char i=0; i<DSM_HEIGHT; i++){ for(char j=0; j<DSM_WIDTH; j++){
 addch(m[i][j]+'0');} addch('\n');}
 
 for(char i=0; i<DSM_HEIGHT; i++){ for(char j=0; j<DSM_WIDTH; j++){
-if(m[i][j]==9)
-switch(i){
-case 0:
-	switch(j){
-	case 0:
-	if(m[i+1][j]!=9 && m[i][j+1]!=9) m[i][j]=8; break;
-	case DSM_WIDTH-1:
-	if(m[i+1][j]!=9 && m[i][j-1]!=9) m[i][j]=8; break;
-	default:
-	if(m[i+1][j]!=9 && m[i][j+1]!=9 && m[i][j-1]!=9) m[i][j]=8; break;}
-	break;
-case DSM_HEIGHT-1:
-	switch(j){
-	case 0:
-	if(m[i-1][j]!=9 && m[i][j+1]!=9) m[i][j]=8; break;
-	case DSM_WIDTH-1:
-	if(m[i-1][j]!=9 && m[i][j-1]!=9) m[i][j]=8; break;
-	default:
-	if(m[i-1][j]!=9 && m[i][j+1]!=9 && m[i][j-1]!=9) m[i][j]=8; break;}
-	break;
-default:
-	switch(j){
-	case 0:
-	if(m[i+1][j]!=9 && m[i-1][j]!=9 && m[i][j+1]!=9) m[i][j]=8; break;
-	case DSM_WIDTH-1:
-	if(m[i+1][j]!=9 && m[i-1][j]!=9 && m[i][j-1]!=9) m[i][j]=8; break;
-	default:
-	if(m[i+1][j]!=9 && m[i-1][j]!=9 && m[i][j+1]!=9 && m[i][j-1]!=9) m[i][j]=8; break;}
-	break;
-}
-//if(m[i][j]==9 && m[(i>0?i-1:0)][j]!=9 && m[(i==DSM_HEIGHT-1?DSM_HEIGHT-1:i+1)][j]!=9
-//	&& m[i][(j>0?j-1:0)]!=9 && m[i][(j==DSM_WIDTH-1?DSM_WIDTH-1:j+1)]!=9)
-//m[i][j] = 8;
-
 if(m[i][j]==9) attron(COLOR_PAIR(1));
 else if(m[i][j]==8) attron(COLOR_PAIR(3));
 else if(m[i][j]==7 || m[i][j]==6) attron(COLOR_PAIR(4));
