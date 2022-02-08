@@ -8,10 +8,11 @@
 #define DSM_HEIGHT 30
 #define DSM_WIDTH 90
 
-void	check_cell(char **m, char i, char j, group *g);
+void	check_cell(char **m, char i, char j, group **g, char x);
 
 int	main(int ac, char **av){
 char	**m;
+group	*g;
 
 srand((unsigned)time(0));
 initscr(); start_color();
@@ -23,6 +24,7 @@ init_pair(4, COLOR_BLACK, 135); //purple in-between
 //allocation
 m = (char **)malloc(sizeof(char *)*DSM_HEIGHT);
 for(char i=0; i<DSM_HEIGHT; i++) m[i] = (char *)malloc(DSM_WIDTH);
+g = NULL;
 
 //random numbers generation
 for(char i=0; i<DSM_HEIGHT; i++) for(char j=0; j<DSM_WIDTH; j++){
@@ -114,9 +116,8 @@ default:
 }}}
 
 //step 4: connect 8 groups
-group	g; g.weight=0; g.list=NULL;
 for(char i=0; i<DSM_HEIGHT; i++){ for(char j=0; j<DSM_WIDTH; j++){
-check_cell(m, i, j, &g);}}
+check_cell(m, i, j, &g, 0);}}
 
 //step 5: add 7 around 8
 for(char i=0; i<DSM_HEIGHT; i++){ for(char j=0; j<DSM_WIDTH; j++){
@@ -160,26 +161,37 @@ else if(m[i][j]==7 || m[i][j]==6) attron(COLOR_PAIR(4));
 else attron(COLOR_PAIR(2));
 addch(' ');} addch('\n');}
 
+printw("\ngroup weights:\n");
+for(group *h=g; h; h=h->next){
+printw("%d ", h->weight);}
+
 getch();
 endwin();
 return 0;}
 
 
-void	check_cell(char **m, char i, char j, group *g){
+void	check_cell(char **m, char i, char j, group **g, char x){
 cell	*new;
+group	*gg;
+group	*h;
 
 if(m[i][j]<8) return;
-//if cell in group return
-for(cell *c=g->list; c!=NULL; c=c->next){
-if(c->i==i && c->j==j) return;}
+//if cell in a group return
+for(h=*g; h; h=h->next){ for(cell *c=h->list; c!=NULL; c=c->next){
+if(c->i==i && c->j==j) return;}}
+//else if it's a new group
+if(!x){ gg=(group *)malloc(sizeof(group));
+gg->weight=0; gg->list=NULL; gg->next=NULL;
+if(!*g) *g=gg; else{
+for(h=*g; h->next; h=h->next){} h->next=gg;}} else gg=*g;
 //add cell to group and increment group weight
 new=(cell *)malloc(sizeof(cell));
-new->i=i; new->j=j; new->next=g->list;
-g->list=new;
-g->weight++;
+new->i=i; new->j=j; new->next=gg->list;
+gg->list=new;
+gg->weight++;
 
-if(i<DSM_HEIGHT-1) check_cell(m, i+1, j, g);
-if(i>0) check_cell(m, i-1, j, g);
-if(j<DSM_WIDTH-1) check_cell(m, i, j+1, g);
-if(j>0) check_cell(m, i, j-1, g);
+if(i<DSM_HEIGHT-1) check_cell(m, i+1, j, &gg, 1);
+if(i>0) check_cell(m, i-1, j, &gg, 1);
+if(j<DSM_WIDTH-1) check_cell(m, i, j+1, &gg, 1);
+if(j>0) check_cell(m, i, j-1, &gg, 1);
 return;}

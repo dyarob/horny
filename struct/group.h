@@ -9,9 +9,10 @@ typedef struct cell {
 	struct cell *next;
 } cell;
 
-typedef struct {
+typedef struct group {
 	char weight;
 	cell *list;
+	struct group *next;
 } group;
 
 #endif
