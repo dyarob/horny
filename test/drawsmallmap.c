@@ -2,6 +2,7 @@
 #include <stdlib.h> //rand(), srand()
 #include <time.h> //time()
 #include <ncurses.h>
+#include <math.h> //sqrt()
 
 #include "group.h"
 
@@ -119,10 +120,18 @@ default:
 //creating groups
 for(char i=0; i<DSM_HEIGHT; i++){ for(char j=0; j<DSM_WIDTH; j++){
 check_cell(m, i, j, &g, 0);}}
-//calculating centers
+//calculating centers (rounded)
 for(group *h=g; h; h=h->next){ int i=0; int j=0;
 for(cell *c=h->list; c; c=c->next){ i+=c->i; j+=c->j;}
 h->c.i=(i+h->weight/2)/h->weight; h->c.j=(j+h->weight/2)/h->weight;}
+//calculating closest group
+for(group *gg=g; gg; gg=gg->next){ group *hh=NULL; float f; float ff;
+for(group *gh=g; gh; gh=gh->next){
+f=sqrt((gg->c.i-gh->c.i)*(gg->c.i-gh->c.i)+(gg->c.j-gh->c.j)*(gg->c.j-gh->c.j));
+if(f<ff)ff=f; hh=gh;}
+//making connections
+
+}
 
 //step 5: add 7 around 8
 for(char i=0; i<DSM_HEIGHT; i++){ for(char j=0; j<DSM_WIDTH; j++){
