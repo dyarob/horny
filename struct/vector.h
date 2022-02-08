@@ -2,8 +2,8 @@
 #define VECTOR_H
 
 typedef struct {
-	char x;
-	char y;
+	char i;
+	char j;
 } vector;
 
 #endif

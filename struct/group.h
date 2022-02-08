@@ -11,6 +11,7 @@ typedef struct cell {
 
 typedef struct group {
 	char weight;
+	vector c;
 	cell *list;
 	struct group *next;
 } group;

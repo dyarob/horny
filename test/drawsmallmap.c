@@ -116,8 +116,13 @@ default:
 }}}
 
 //step 4: connect 8 groups
+//creating groups
 for(char i=0; i<DSM_HEIGHT; i++){ for(char j=0; j<DSM_WIDTH; j++){
 check_cell(m, i, j, &g, 0);}}
+//calculating centers
+for(group *h=g; h; h=h->next){ int i=0; int j=0;
+for(cell *c=h->list; c; c=c->next){ i+=c->i; j+=c->j;}
+h->c.i=(i+h->weight/2)/h->weight; h->c.j=(j+h->weight/2)/h->weight;}
 
 //step 5: add 7 around 8
 for(char i=0; i<DSM_HEIGHT; i++){ for(char j=0; j<DSM_WIDTH; j++){
@@ -164,6 +169,9 @@ addch(' ');} addch('\n');}
 printw("\ngroup weights:\n");
 for(group *h=g; h; h=h->next){
 printw("%d ", h->weight);}
+
+for(group *h=g; h; h=h->next){
+mvaddch(DSM_HEIGHT+h->c.i, h->c.j, 'o');}
 
 getch();
 endwin();
