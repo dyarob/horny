@@ -20,10 +20,11 @@ init_pair(4, COLOR_BLACK, 135); //purple in-between
 m = (char **)malloc(sizeof(char *)*DSM_HEIGHT);
 for(char i=0; i<DSM_HEIGHT; i++) m[i] = (char *)malloc(DSM_WIDTH);
 
-//generation
+//random numbers generation
 for(char i=0; i<DSM_HEIGHT; i++) for(char j=0; j<DSM_WIDTH; j++){
 m[i][j] = rand()%10;}
 
+//step 1: eliminate isolated 9
 for(char i=0; i<DSM_HEIGHT; i++){ for(char j=0; j<DSM_WIDTH; j++){
 if(m[i][j]==9)
 switch(i){
@@ -49,29 +50,62 @@ default:
 	default: if(m[i][j+1]!=9 && m[i][j-1]!=9) m[i][j]=8; break;}
 	break;
 }}}
+
+//step 2: eliminate isolated 8
 for(char i=0; i<DSM_HEIGHT; i++){ for(char j=0; j<DSM_WIDTH; j++){
 if(m[i][j]==8)
 switch(i){
 case 0:
-	if(m[i+1][j]!=8)
+	if(m[i+1][j]<8)
 	switch(j){
-	case 0: if(m[i][j+1]!=8) m[i][j]=0; break;
-	case DSM_WIDTH-1: if(m[i][j-1]!=8) m[i][j]=0; break;
-	default: if(m[i][j+1]!=8 && m[i][j-1]!=8) m[i][j]=0; break;}
+	case 0: if(m[i][j+1]<8) m[i][j]=0; break;
+	case DSM_WIDTH-1: if(m[i][j-1]<8) m[i][j]=0; break;
+	default: if(m[i][j+1]<8 && m[i][j-1]<8) m[i][j]=0; break;}
 	break;
 case DSM_HEIGHT-1:
-	if(m[i-1][j]!=8)
+	if(m[i-1][j]<8)
 	switch(j){
-	case 0: if(m[i][j+1]!=8) m[i][j]=0; break;
-	case DSM_WIDTH-1: if(m[i][j-1]!=8) m[i][j]=0; break;
-	default: if(m[i][j+1]!=8 && m[i][j-1]!=8) m[i][j]=0; break;}
+	case 0: if(m[i][j+1]<8) m[i][j]=0; break;
+	case DSM_WIDTH-1: if(m[i][j-1]<8) m[i][j]=0; break;
+	default: if(m[i][j+1]<8 && m[i][j-1]<8) m[i][j]=0; break;}
 	break;
 default:
-	if(m[i+1][j]!=8 && m[i-1][j]!=8)
+	if(m[i+1][j]<8 && m[i-1][j]<8)
 	switch(j){
-	case 0: if(m[i][j+1]!=8) m[i][j]=0; break;
-	case DSM_WIDTH-1: if(m[i][j-1]!=8) m[i][j]=0; break;
-	default: if(m[i][j+1]!=8 && m[i][j-1]!=8) m[i][j]=0; break;}
+	case 0: if(m[i][j+1]<8) m[i][j]=0; break;
+	case DSM_WIDTH-1: if(m[i][j-1]<8) m[i][j]=0; break;
+	default: if(m[i][j+1]<8 && m[i][j-1]<8) m[i][j]=0; break;}
+	break;
+}}}
+
+//step 3: add 8 around 9
+for(char i=0; i<DSM_HEIGHT; i++){ for(char j=0; j<DSM_WIDTH; j++){
+if(m[i][j]==9)
+switch(i){
+case 0:
+	if(m[i+1][j]<8) m[i+1][j]=8;
+	switch(j){
+	case 0: if(m[i][j+1]<8) m[i][j+1]=8; break;
+	case DSM_WIDTH-1: if(m[i][j-1]<8) m[i][j-1]=8; break;
+	default: if(m[i][j+1]<8) m[i][j+1]=8;
+		 if(m[i][j-1]<8) m[i][j-1]=8; break;}
+	break;
+case DSM_HEIGHT-1:
+	if(m[i-1][j]<8) m[i-1][j]=8;
+	switch(j){
+	case 0: if(m[i][j+1]<8) m[i][j+1]=8; break;
+	case DSM_WIDTH-1: if(m[i][j-1]<8) m[i][j-1]=8; break;
+	default: if(m[i][j+1]<8) m[i][j+1]=8;
+		 if(m[i][j-1]<8) m[i][j-1]=8; break;}
+	break;
+default:
+	if(m[i+1][j]<8) m[i+1][j]=8;
+	if(m[i-1][j]<8) m[i-1][j]=8;
+	switch(j){
+	case 0: if(m[i][j+1]<8) m[i][j+1]=8; break;
+	case DSM_WIDTH-1: if(m[i][j-1]<8) m[i][j-1]=8; break;
+	default: if(m[i][j+1]<8) m[i][j+1]=8;
+		 if(m[i][j-1]<8) m[i][j-1]=8; break;}
 	break;
 }}}
 
