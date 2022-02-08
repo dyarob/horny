@@ -3,8 +3,12 @@
 #include <time.h> //time()
 #include <ncurses.h>
 
+#include "group.h"
+
 #define DSM_HEIGHT 30
 #define DSM_WIDTH 90
+
+void	check_cell(char **m, char i, char j, group *g);
 
 int	main(int ac, char **av){
 char	**m;
@@ -110,6 +114,9 @@ default:
 }}}
 
 //step 4: connect 8 groups
+group	g; g.weight=0; g.list=NULL;
+for(char i=0; i<DSM_HEIGHT; i++){ for(char j=0; j<DSM_WIDTH; j++){
+check_cell(m, i, j, &g);}}
 
 //step 5: add 7 around 8
 for(char i=0; i<DSM_HEIGHT; i++){ for(char j=0; j<DSM_WIDTH; j++){
@@ -156,3 +163,23 @@ addch(' ');} addch('\n');}
 getch();
 endwin();
 return 0;}
+
+
+void	check_cell(char **m, char i, char j, group *g){
+cell	*new;
+
+if(m[i][j]<8) return;
+//if cell in group return
+for(cell *c=g->list; c!=NULL; c=c->next){
+if(c->i==i && c->j==j) return;}
+//add cell to group and increment group weight
+new=(cell *)malloc(sizeof(cell));
+new->i=i; new->j=j; new->next=g->list;
+g->list=new;
+g->weight++;
+
+if(i<DSM_HEIGHT-1) check_cell(m, i+1, j, g);
+if(i>0) check_cell(m, i-1, j, g);
+if(j<DSM_WIDTH-1) check_cell(m, i, j+1, g);
+if(j>0) check_cell(m, i, j-1, g);
+return;}
