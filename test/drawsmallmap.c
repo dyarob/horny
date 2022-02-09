@@ -28,8 +28,8 @@ for(char i=0; i<DSM_HEIGHT; i++) m[i] = (char *)malloc(DSM_WIDTH);
 g = NULL;
 
 //random numbers generation
-for(char i=0; i<DSM_HEIGHT; i++) for(char j=0; j<DSM_WIDTH; j++){
-m[i][j] = rand()%10;}
+for(char i=0; i<DSM_HEIGHT; i++){ for(char j=0; j<DSM_WIDTH; j++){
+m[i][j] = rand()%10;}}
 
 //step 1: eliminate isolated 9
 for(char i=0; i<DSM_HEIGHT; i++){ for(char j=0; j<DSM_WIDTH; j++){
@@ -125,11 +125,26 @@ for(group *h=g; h; h=h->next){ int i=0; int j=0;
 for(cell *c=h->list; c; c=c->next){ i+=c->i; j+=c->j;}
 h->c.i=(i+h->weight/2)/h->weight; h->c.j=(j+h->weight/2)/h->weight;}
 //calculating closest group
-for(group *gg=g; gg; gg=gg->next){ group *hh=NULL; float f; float ff;
+for(group *gg=g; gg; gg=gg->next){ group *hh=NULL; float f, ff=200;
 for(group *gh=g; gh; gh=gh->next){
+if(gh!=gg){
 f=sqrt((gg->c.i-gh->c.i)*(gg->c.i-gh->c.i)+(gg->c.j-gh->c.j)*(gg->c.j-gh->c.j));
-if(f<ff)ff=f; hh=gh;}
-//making connections
+if(f<ff){ ff=f; hh=gh;}}
+//printw("ff= %f  ", ff);
+}
+//calculating increments
+float inc, jnc;
+if(!(hh->c.j-gg->c.j)) if(hh->c.i-gg->c.i<0) inc=-1; else inc=1;
+else inc=(float)(hh->c.i-gg->c.i)/abs(hh->c.j-gg->c.j);
+if(!(hh->c.i-gg->c.i)) if(hh->c.j-gg->c.j<0) jnc=-1; else jnc=1;
+else jnc=(float)(hh->c.j-gg->c.j)/abs(hh->c.i-gg->c.i);
+//printw("inc= %f and jnc= %f.  ", inc, jnc);
+if(inc>1) inc=1; else if(inc<-1) inc=-1;
+if(jnc>1) jnc=1; else if(jnc<-1) jnc=-1;
+
+for(char i=1; hh->c.i-gg->c.i-i*inc>0 || hh->c.j-gg->c.j-i*jnc>0; i++){
+m[abs((int)(gg->c.i+i*inc))][abs((int)(gg->c.j+i*jnc))]=9;
+}
 
 }
 
@@ -179,8 +194,10 @@ printw("\ngroup weights:\n");
 for(group *h=g; h; h=h->next){
 printw("%d ", h->weight);}
 
+/*//print group center (debug)
 for(group *h=g; h; h=h->next){
 mvaddch(DSM_HEIGHT+h->c.i, h->c.j, 'o');}
+*/
 
 getch();
 endwin();
