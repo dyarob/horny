@@ -122,10 +122,12 @@ for(char i=0; i<DSM_HEIGHT; i++){ for(char j=0; j<DSM_WIDTH; j++){
 check_cell(m, i, j, &g, 0);}}
 
 //step 4b: remove smallest groups
-for(group *h=g; h->next; h=h->next){
-if(h->next->weight<=3){
-for(cell *c=h->next->list; c; c=c->next){ m[c->i][c->j]=0;}
-h->next=h->next->next;}}
+{ group *prev=g;
+for(group *h=g->next; h; h=h->next){
+if(h->weight<=3){
+//for(cell *c=h->next->list; c; c=c->next){ m[c->i][c->j]=0;}
+prev->next=h->next;}
+else prev=h;}}
 
 //calculating centers (rounded)
 for(group *h=g; h; h=h->next){ int i=0; int j=0;
@@ -197,9 +199,10 @@ printw("\ngroup weights:\n");
 for(group *h=g; h; h=h->next){
 printw("%d ", h->weight);}
 
-//print group center (debug)
+/*//print group center (debug)
 for(group *h=g; h; h=h->next){
 mvaddch(DSM_HEIGHT+h->c.i, h->c.j*2, 'o');}
+*/
 
 getch();
 endwin();
