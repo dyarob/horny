@@ -141,9 +141,11 @@ group *hh=NULL, *hhh=NULL; float f, ff=200, fff=200;
 for(group *gh=g; gh; gh=gh->next){
 if(gh!=gg){
 f=sqrt((gg->c.i-gh->c.i)*(gg->c.i-gh->c.i)+(gg->c.j-gh->c.j)*(gg->c.j-gh->c.j));
-if(f<ff){ ff=f; hh=gh;}}//debug: printw("ff= %f  ", ff);
+if(f<ff){ ff=f; hh=gh;}//debug: printw("ff= %f  ", ff);
+else if(f<fff && f!=ff){ fff=f; hhh=gh;}}
 }
 
+//first closest group
 //calculating increments
 float inc, jnc;
 if(!(hh->c.j-gg->c.j)) if(hh->c.i-gg->c.i<0) inc=-1; else inc=1;
@@ -153,9 +155,21 @@ else jnc=(float)(hh->c.j-gg->c.j)/abs(hh->c.i-gg->c.i);
 //debug: printw("inc= %f and jnc= %f.  ", inc, jnc);
 if(inc>1) inc=1; else if(inc<-1) inc=-1;
 if(jnc>1) jnc=1; else if(jnc<-1) jnc=-1;
-
 //drawing connections
 for(char i=1; fabs(hh->c.i-gg->c.i-i*inc)>0 || fabs(hh->c.j-gg->c.j-i*jnc)>0; i++){
+m[abs((int)(gg->c.i+i*inc))][abs((int)(gg->c.j+i*jnc))]=8;}
+
+//second closest group
+//calculating increments
+if(!(hhh->c.j-gg->c.j)) if(hhh->c.i-gg->c.i<0) inc=-1; else inc=1;
+else inc=(float)(hhh->c.i-gg->c.i)/abs(hhh->c.j-gg->c.j);
+if(!(hhh->c.i-gg->c.i)) if(hhh->c.j-gg->c.j<0) jnc=-1; else jnc=1;
+else jnc=(float)(hhh->c.j-gg->c.j)/abs(hhh->c.i-gg->c.i);
+//debug: printw("inc= %f and jnc= %f.  ", inc, jnc);
+if(inc>1) inc=1; else if(inc<-1) inc=-1;
+if(jnc>1) jnc=1; else if(jnc<-1) jnc=-1;
+//drawing connections
+for(char i=1; fabs(hhh->c.i-gg->c.i-i*inc)>0 || fabs(hhh->c.j-gg->c.j-i*jnc)>0; i++){
 m[abs((int)(gg->c.i+i*inc))][abs((int)(gg->c.j+i*jnc))]=8;}}
 
 //step 5: add 7 around 8
@@ -190,9 +204,13 @@ default:
 }}}
 
 //display
+/*
+//print num map
 for(char i=0; i<DSM_HEIGHT; i++){ for(char j=0; j<DSM_WIDTH; j++){
 addch(m[i][j]+'0'); addch(' ');} addch('\n');}
+*/
 
+//print color map
 for(char i=0; i<DSM_HEIGHT; i++){ for(char j=0; j<DSM_WIDTH; j++){
 if(m[i][j]==9) attron(COLOR_PAIR(1));
 else if(m[i][j]==8) attron(COLOR_PAIR(3));
@@ -200,9 +218,12 @@ else if(m[i][j]==7) attron(COLOR_PAIR(4));
 else attron(COLOR_PAIR(2));
 addch(' '); addch(' ');} addch('\n');}
 
+/*
+//print group weights
 printw("\ngroup weights:\n");
 for(group *h=g; h; h=h->next){
 printw("%d ", h->weight);}
+*/
 
 /*//print group center (debug)
 for(group *h=g; h; h=h->next){
