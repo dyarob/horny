@@ -12,8 +12,8 @@
 void	check_cell(char **m, char i, char j, group **g, char x);
 
 int	main(int ac, char **av){
-char	**m;
-group	*g;
+char **m;
+group *g; path *p;
 
 srand((unsigned)time(0));
 initscr(); start_color();
@@ -25,7 +25,7 @@ init_pair(4, COLOR_BLACK, 135); //purple in-between
 //allocation
 m = (char **)malloc(sizeof(char *)*DSM_HEIGHT);
 for(char i=0; i<DSM_HEIGHT; i++) m[i] = (char *)malloc(DSM_WIDTH);
-g = NULL;
+g = NULL; p = NULL;
 
 //random numbers generation
 for(char i=0; i<DSM_HEIGHT; i++){ for(char j=0; j<DSM_WIDTH; j++){
@@ -135,6 +135,7 @@ for(group *h=g; h; h=h->next){ int i=0; int j=0;
 for(cell *c=h->list; c; c=c->next){ i+=c->i; j+=c->j;}
 h->c.i=(i+h->weight/2)/h->weight; h->c.j=(j+h->weight/2)/h->weight;}
 
+//generating shortest paths list
 //calculating closest groups
 for(group *gg=g; gg; gg=gg->next){
 group *hh=NULL, *hhh=NULL;
@@ -145,56 +146,40 @@ f=sqrt((gg->c.i-gh->c.i)*(gg->c.i-gh->c.i)+(gg->c.j-gh->c.j)*(gg->c.j-gh->c.j));
 if(f<ff){ ff=f; hh=gh;}//debug: printw("ff= %f  ", ff);
 else if(f<fff && f!=ff){ fff=f; hhh=gh;}}
 }}
-
-//first closest group
-//finding closest point
-cell *x; cell *y;
+//creating paths if don't already exist
+if(!p){ p=(path *)malloc(sizeof(path)); p->g=gg; p->h=hh; p->next=NULL;
+p->next=(path *)malloc(sizeof(path));
+p->next->g=gg; p->next->h=hhh; p->next->next=NULL;}
+else{ path **pp; pp=(path **)malloc(sizeof(path *));
+for((*pp)=p; (*pp) && ((*pp)->g!=gg || (*pp)->h!=hh); (*pp)=(*pp)->next){}
+if(!(*pp)){ (*pp)=(path *)malloc(sizeof(path));
+(*pp)->g=gg; (*pp)->h=hh; (*pp)->next=p; p=*pp;}
+for((*pp)=p; (*pp) && ((*pp)->g!=gg || (*pp)->h!=hhh); (*pp)=(*pp)->next){}
+if(!(*pp)){ (*pp)=(path *)malloc(sizeof(path));
+(*pp)->g=gg; (*pp)->h=hhh; (*pp)->next=p; p=*pp;}}}
+//finding closest points
+for(path *pp=p; pp; pp=pp->next){
 { float f, ff=200;
-for(cell *c=gg->list; c; c=c->next){
-f=sqrt((c->i-hh->c.i)*(c->i-hh->c.i)+(c->j-hh->c.j)*(c->j-hh->c.j));
-if(f<ff){ ff=f; x=c;}
-}}
+for(cell *c=pp->g->list; c; c=c->next){
+f=sqrt((c->i-pp->h->c.i)*(c->i-pp->h->c.i)+(c->j-pp->h->c.j)*(c->j-pp->h->c.j));
+if(f<ff){ ff=f; pp->a=c;}}}
 { float f, ff=200;
-for(cell *c=hh->list; c; c=c->next){
-f=sqrt((gg->c.i-c->i)*(gg->c.i-c->i)+(gg->c.j-c->j)*(gg->c.j-c->j));
-if(f<ff){ ff=f; y=c;}
-}}
+for(cell *c=pp->h->list; c; c=c->next){
+f=sqrt((pp->g->c.i-c->i)*(pp->g->c.i-c->i)+(pp->g->c.j-c->j)*(pp->g->c.j-c->j));
+if(f<ff){ ff=f; pp->b=c;}}}
 //calculating increments
 float inc, jnc;
-if(!(y->j-x->j)) if(y->i-x->i<0) inc=-1; else inc=1;
-else inc=(float)(y->i-x->i)/abs(y->j-x->j);
-if(!(y->i-x->i)) if(y->j-x->j<0) jnc=-1; else jnc=1;
-else jnc=(float)(y->j-x->j)/abs(y->i-x->i);
+if(!(pp->b->j-pp->a->j)) if(pp->b->i-pp->a->i<0) inc=-1; else inc=1;
+else inc=(float)(pp->b->i-pp->a->i)/abs(pp->b->j-pp->a->j);
+if(!(pp->b->i-pp->a->i)) if(pp->b->j-pp->a->j<0) jnc=-1; else jnc=1;
+else jnc=(float)(pp->b->j-pp->a->j)/abs(pp->b->i-pp->a->i);
 //debug: printw("inc= %f and jnc= %f.  ", inc, jnc);
 if(inc>1) inc=1; else if(inc<-1) inc=-1;
 if(jnc>1) jnc=1; else if(jnc<-1) jnc=-1;
-//drawing connections
-for(char i=1; fabs(y->i-x->i-i*inc)>0 || fabs(y->j-x->j-i*jnc)>0; i++){
-m[abs((int)(x->i+i*inc))][abs((int)(x->j+i*jnc))]=9;}
 
-//second closest group
-//finding closest point
-{ float f, ff=200;
-for(cell *c=gg->list; c; c=c->next){
-f=sqrt((c->i-hh->c.i)*(c->i-hh->c.i)+(c->j-hh->c.j)*(c->j-hh->c.j));
-if(f<ff){ ff=f; x=c;}
-}}
-{ float f, ff=200;
-for(cell *c=hhh->list; c; c=c->next){
-f=sqrt((gg->c.i-c->i)*(gg->c.i-c->i)+(gg->c.j-c->j)*(gg->c.j-c->j));
-if(f<ff){ ff=f; y=c;}
-}}
-//calculating increments
-if(!(y->j-x->j)) if(y->i-x->i<0) inc=-1; else inc=1;
-else inc=(float)(y->i-x->i)/abs(y->j-x->j);
-if(!(y->i-x->i)) if(y->j-x->j<0) jnc=-1; else jnc=1;
-else jnc=(float)(y->j-x->j)/abs(y->i-x->i);
-//debug: printw("inc= %f and jnc= %f.  ", inc, jnc);
-if(inc>1) inc=1; else if(inc<-1) inc=-1;
-if(jnc>1) jnc=1; else if(jnc<-1) jnc=-1;
 //drawing connections
-for(char i=1; fabs(y->i-x->i-i*inc)>0 || fabs(y->j-x->j-i*jnc)>0; i++){
-m[abs((int)(x->i+i*inc))][abs((int)(x->j+i*jnc))]=9;}}
+for(char i=1; fabs(pp->b->i-pp->a->i-i*inc)>0 || fabs(pp->b->j-pp->a->j-i*jnc)>0; i++){
+m[abs((int)(pp->a->i+i*inc))][abs((int)(pp->a->j+i*jnc))]=8;}}
 
 //step 5: add 7 around 8
 for(char i=0; i<DSM_HEIGHT; i++){ for(char j=0; j<DSM_WIDTH; j++){
@@ -228,8 +213,7 @@ default:
 }}}
 
 //display
-/*
-//print num map
+/*//print num map
 for(char i=0; i<DSM_HEIGHT; i++){ for(char j=0; j<DSM_WIDTH; j++){
 addch(m[i][j]+'0'); addch(' ');} addch('\n');}
 */
@@ -238,20 +222,20 @@ addch(m[i][j]+'0'); addch(' ');} addch('\n');}
 for(char i=0; i<DSM_HEIGHT; i++){ for(char j=0; j<DSM_WIDTH; j++){
 if(m[i][j]==9) attron(COLOR_PAIR(1));
 else if(m[i][j]==8) attron(COLOR_PAIR(3));
-else if(m[i][j]==7) attron(COLOR_PAIR(4));
+else if(m[i][j]==7 || m[i][j]==6) attron(COLOR_PAIR(4));
 else attron(COLOR_PAIR(2));
 addch(' '); addch(' ');} addch('\n');}
 
-/*
-//print group weights
+/*//print group weights
 printw("\ngroup weights:\n");
 for(group *h=g; h; h=h->next){
 printw("%d ", h->weight);}
 */
 
-//print group center (debug)
+/*//print group center (debug)
 for(group *h=g; h; h=h->next){
-mvaddch(/*DSM_HEIGHT+*/h->c.i, h->c.j*2, 'o');}
+mvaddch(*//*DSM_HEIGHT+*//*h->c.i, h->c.j*2, 'o');}
+*/
 
 getch();
 endwin();

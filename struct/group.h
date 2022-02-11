@@ -16,4 +16,12 @@ typedef struct group {
 	struct group *next;
 } group;
 
+typedef struct path {
+	group *g;
+	cell *a;
+	group *h;
+	cell *b;
+	struct path *next;
+} path;
+
 #endif
