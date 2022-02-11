@@ -137,40 +137,64 @@ h->c.i=(i+h->weight/2)/h->weight; h->c.j=(j+h->weight/2)/h->weight;}
 
 //calculating closest groups
 for(group *gg=g; gg; gg=gg->next){
-group *hh=NULL, *hhh=NULL; float f, ff=200, fff=200;
+group *hh=NULL, *hhh=NULL;
+{ float f, ff=200, fff=200;
 for(group *gh=g; gh; gh=gh->next){
 if(gh!=gg){
 f=sqrt((gg->c.i-gh->c.i)*(gg->c.i-gh->c.i)+(gg->c.j-gh->c.j)*(gg->c.j-gh->c.j));
 if(f<ff){ ff=f; hh=gh;}//debug: printw("ff= %f  ", ff);
 else if(f<fff && f!=ff){ fff=f; hhh=gh;}}
-}
+}}
 
 //first closest group
+//finding closest point
+cell *x; cell *y;
+{ float f, ff=200;
+for(cell *c=gg->list; c; c=c->next){
+f=sqrt((c->i-hh->c.i)*(c->i-hh->c.i)+(c->j-hh->c.j)*(c->j-hh->c.j));
+if(f<ff){ ff=f; x=c;}
+}}
+{ float f, ff=200;
+for(cell *c=hh->list; c; c=c->next){
+f=sqrt((gg->c.i-c->i)*(gg->c.i-c->i)+(gg->c.j-c->j)*(gg->c.j-c->j));
+if(f<ff){ ff=f; y=c;}
+}}
 //calculating increments
 float inc, jnc;
-if(!(hh->c.j-gg->c.j)) if(hh->c.i-gg->c.i<0) inc=-1; else inc=1;
-else inc=(float)(hh->c.i-gg->c.i)/abs(hh->c.j-gg->c.j);
-if(!(hh->c.i-gg->c.i)) if(hh->c.j-gg->c.j<0) jnc=-1; else jnc=1;
-else jnc=(float)(hh->c.j-gg->c.j)/abs(hh->c.i-gg->c.i);
+if(!(y->j-x->j)) if(y->i-x->i<0) inc=-1; else inc=1;
+else inc=(float)(y->i-x->i)/abs(y->j-x->j);
+if(!(y->i-x->i)) if(y->j-x->j<0) jnc=-1; else jnc=1;
+else jnc=(float)(y->j-x->j)/abs(y->i-x->i);
 //debug: printw("inc= %f and jnc= %f.  ", inc, jnc);
 if(inc>1) inc=1; else if(inc<-1) inc=-1;
 if(jnc>1) jnc=1; else if(jnc<-1) jnc=-1;
 //drawing connections
-for(char i=1; fabs(hh->c.i-gg->c.i-i*inc)>0 || fabs(hh->c.j-gg->c.j-i*jnc)>0; i++){
-m[abs((int)(gg->c.i+i*inc))][abs((int)(gg->c.j+i*jnc))]=8;}
+for(char i=1; fabs(y->i-x->i-i*inc)>0 || fabs(y->j-x->j-i*jnc)>0; i++){
+m[abs((int)(x->i+i*inc))][abs((int)(x->j+i*jnc))]=9;}
 
 //second closest group
+//finding closest point
+{ float f, ff=200;
+for(cell *c=gg->list; c; c=c->next){
+f=sqrt((c->i-hh->c.i)*(c->i-hh->c.i)+(c->j-hh->c.j)*(c->j-hh->c.j));
+if(f<ff){ ff=f; x=c;}
+}}
+{ float f, ff=200;
+for(cell *c=hhh->list; c; c=c->next){
+f=sqrt((gg->c.i-c->i)*(gg->c.i-c->i)+(gg->c.j-c->j)*(gg->c.j-c->j));
+if(f<ff){ ff=f; y=c;}
+}}
 //calculating increments
-if(!(hhh->c.j-gg->c.j)) if(hhh->c.i-gg->c.i<0) inc=-1; else inc=1;
-else inc=(float)(hhh->c.i-gg->c.i)/abs(hhh->c.j-gg->c.j);
-if(!(hhh->c.i-gg->c.i)) if(hhh->c.j-gg->c.j<0) jnc=-1; else jnc=1;
-else jnc=(float)(hhh->c.j-gg->c.j)/abs(hhh->c.i-gg->c.i);
+if(!(y->j-x->j)) if(y->i-x->i<0) inc=-1; else inc=1;
+else inc=(float)(y->i-x->i)/abs(y->j-x->j);
+if(!(y->i-x->i)) if(y->j-x->j<0) jnc=-1; else jnc=1;
+else jnc=(float)(y->j-x->j)/abs(y->i-x->i);
 //debug: printw("inc= %f and jnc= %f.  ", inc, jnc);
 if(inc>1) inc=1; else if(inc<-1) inc=-1;
 if(jnc>1) jnc=1; else if(jnc<-1) jnc=-1;
 //drawing connections
-for(char i=1; fabs(hhh->c.i-gg->c.i-i*inc)>0 || fabs(hhh->c.j-gg->c.j-i*jnc)>0; i++){
-m[abs((int)(gg->c.i+i*inc))][abs((int)(gg->c.j+i*jnc))]=8;}}
+for(char i=1; fabs(y->i-x->i-i*inc)>0 || fabs(y->j-x->j-i*jnc)>0; i++){
+m[abs((int)(x->i+i*inc))][abs((int)(x->j+i*jnc))]=9;}}
 
 //step 5: add 7 around 8
 for(char i=0; i<DSM_HEIGHT; i++){ for(char j=0; j<DSM_WIDTH; j++){
@@ -225,10 +249,9 @@ for(group *h=g; h; h=h->next){
 printw("%d ", h->weight);}
 */
 
-/*//print group center (debug)
+//print group center (debug)
 for(group *h=g; h; h=h->next){
-mvaddch(DSM_HEIGHT+h->c.i, h->c.j*2, 'o');}
-*/
+mvaddch(/*DSM_HEIGHT+*/h->c.i, h->c.j*2, 'o');}
 
 getch();
 endwin();
