@@ -1,5 +1,5 @@
 #include <stdio.h> //putchar()
-#include <stdlib.h> //rand(), srand()
+#include <stdlib.h> //rand(), srand(), malloc()
 #include <time.h> //time()
 #include <ncurses.h>
 #include <math.h> //sqrt()

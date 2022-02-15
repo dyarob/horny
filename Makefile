@@ -12,3 +12,6 @@ colors2:
 
 testvector:
 	gcc test/testvector.c -Istruct
+
+testlvl:
+	gcc test/testlvl.c -lncurses
