@@ -14,4 +14,4 @@ testvector:
 	gcc test/testvector.c -Istruct
 
 testlvl:
-	gcc test/testlvl.c -lncurses
+	gcc test/testlvl.c -lncurses -Istruct
